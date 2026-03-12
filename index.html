@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather App</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .weather-box {
+            margin-top: 20px;
+            font-size: 15px;
+        }
+
+        img {
+            width: 64px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🌤 Weather App</h1>
+
+    <div class="search-box">
+        <input type="text" id="locationInput" placeholder="Enter city name">
+        <button onclick="getWeather()">Search</button>
+    </div>
+
+    <div id="weather" class="weather-box"></div>
+</div>
+
+<script>
+    function getWeather() {
+        const location = document.getElementById("locationInput").value;
+
+        if (location === "") {
+            alert("Please enter a location");
+            return;
+        }
+
+        const apiKey = "d39fbeadfddb485aadf90525261701";
+        const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=yes`;
+
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("weather").innerHTML =
+                        "<p>❌ Location not found</p>";
+                    return;
+                }
+
+                document.getElementById("weather").innerHTML = `
+                    <h2>${data.location.name}, ${data.location.country}</h2>
+                    <img src="${data.current.condition.icon}" alt="icon">
+                    <p><strong>${data.current.condition.text}</strong></p>
+                    <p>🌡 Temperature: ${data.current.temp_c} °C</p>
+                    <p>💧 Humidity: ${data.current.humidity}%</p>
+                    <p>💨 Wind: ${data.current.wind_kph} km/h</p>
+                    <p>🌫 AQI (PM2.5): ${data.current.air_quality.pm2_5.toFixed(2)}</p>
+                `;
+            })
+            .catch(() => {
+                document.getElementById("weather").innerHTML =
+                    "<p>⚠️ Error fetching data</p>";
+            });
+    }
+</script>
+
+</body>
+</html>
