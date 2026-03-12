@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Weather App</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI, sans-serif;
+}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#1d2671,#c33764);
+color:white;
+}
+
+.container{
+width:420px;
+padding:30px;
+border-radius:20px;
+background:rgba(255,255,255,0.1);
+backdrop-filter:blur(15px);
+box-shadow:0 20px 40px rgba(0,0,0,0.3);
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+}
+
+.search{
+display:flex;
+gap:10px;
+margin-bottom:20px;
+}
+
+.search input{
+flex:1;
+padding:10px;
+border-radius:8px;
+border:none;
+outline:none;
+}
+
+.search button{
+padding:10px 15px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:white;
+font-weight:bold;
+}
+
+.search button:hover{
+background:#eee;
+}
+
+.weather-main{
+text-align:center;
+margin-bottom:20px;
+}
+
+.weather-main img{
+width:90px;
+}
+
+.temp{
+font-size:40px;
+font-weight:bold;
+}
+
+.condition{
+font-size:18px;
+opacity:0.9;
+}
+
+.details{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+margin-top:20px;
+}
+
+.card{
+background:rgba(255,255,255,0.15);
+padding:10px;
+border-radius:10px;
+text-align:center;
+}
+
+.forecast{
+margin-top:25px;
+}
+
+.forecast-title{
+margin-bottom:10px;
+text-align:center;
+}
+
+.forecast-days{
+display:flex;
+justify-content:space-between;
+}
+
+.day{
+text-align:center;
+background:rgba(255,255,255,0.15);
+padding:10px;
+border-radius:10px;
+width:30%;
+}
+
+.day img{
+width:40px;
+}
+
+.loading{
+text-align:center;
+display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🌤 Weather App</h1>
+
+<div class="search">
+
+<input list="cities" id="cityInput" placeholder="Search or select city">
+
+<datalist id="cities">
+<option value="Hyderabad">
+<option value="Mumbai">
+<option value="Delhi">
+<option value="Bangalore">
+<option value="Chennai">
+<option value="Kolkata">
+<option value="Pune">
+<option value="Ahmedabad">
+<option value="Visakhapatnam">
+<option value="Vijayawada">
+<option value="Tirupati">
+<option value="Warangal">
+<option value="New York">
+<option value="London">
+<option value="Dubai">
+<option value="Tokyo">
+<option value="Sydney">
+</datalist>
+
+<button onclick="searchWeather()">Search</button>
+<button onclick="getLocation()">📍</button>
+
+</div>
+
+<div class="loading" id="loading">Loading weather...</div>
+
+<div id="weatherContent" style="display:none">
+
+<div class="weather-main">
+<h2 id="city"></h2>
+<img id="icon">
+<div class="temp" id="temp"></div>
+<div class="condition" id="condition"></div>
+</div>
+
+<div class="details">
+
+<div class="card">
+💧 Humidity
+<p id="humidity"></p>
+</div>
+
+<div class="card">
+🌬 Wind
+<p id="wind"></p>
+</div>
+
+<div class="card">
+🌡 Feels Like
+<p id="feels"></p>
+</div>
+
+<div class="card">
+🧭 Pressure
+<p id="pressure"></p>
+</div>
+
+<div class="card">
+🌅 Sunrise
+<p id="sunrise"></p>
+</div>
+
+<div class="card">
+🌇 Sunset
+<p id="sunset"></p>
+</div>
+
+</div>
+
+<div class="forecast">
+
+<div class="forecast-title">3 Day Forecast</div>
+
+<div class="forecast-days">
+
+<div class="day">
+<p id="day1"></p>
+<img id="icon1">
+<p id="temp1"></p>
+</div>
+
+<div class="day">
+<p id="day2"></p>
+<img id="icon2">
+<p id="temp2"></p>
+</div>
+
+<div class="day">
+<p id="day3"></p>
+<img id="icon3">
+<p id="temp3"></p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const apiKey="d39fbeadfddb485aadf90525261701";
+
+async function fetchWeather(url){
+
+document.getElementById("loading").style.display="block";
+document.getElementById("weatherContent").style.display="none";
+
+const res=await fetch(url);
+const data=await res.json();
+
+document.getElementById("loading").style.display="none";
+document.getElementById("weatherContent").style.display="block";
+
+document.getElementById("city").innerText=
+data.location.name+", "+data.location.country;
+
+document.getElementById("temp").innerText=
+data.current.temp_c+"°C";
+
+document.getElementById("condition").innerText=
+data.current.condition.text;
+
+document.getElementById("icon").src=
+data.current.condition.icon;
+
+document.getElementById("humidity").innerText=
+data.current.humidity+"%";
+
+document.getElementById("wind").innerText=
+data.current.wind_kph+" km/h";
+
+document.getElementById("feels").innerText=
+data.current.feelslike_c+"°C";
+
+document.getElementById("pressure").innerText=
+data.current.pressure_mb+" mb";
+
+document.getElementById("sunrise").innerText=
+data.forecast.forecastday[0].astro.sunrise;
+
+document.getElementById("sunset").innerText=
+data.forecast.forecastday[0].astro.sunset;
+
+const forecast=data.forecast.forecastday;
+
+document.getElementById("day1").innerText=new Date(forecast[0].date).toDateString().slice(0,3);
+document.getElementById("icon1").src=forecast[0].day.condition.icon;
+document.getElementById("temp1").innerText=forecast[0].day.avgtemp_c+"°C";
+
+document.getElementById("day2").innerText=new Date(forecast[1].date).toDateString().slice(0,3);
+document.getElementById("icon2").src=forecast[1].day.condition.icon;
+document.getElementById("temp2").innerText=forecast[1].day.avgtemp_c+"°C";
+
+document.getElementById("day3").innerText=new Date(forecast[2].date).toDateString().slice(0,3);
+document.getElementById("icon3").src=forecast[2].day.condition.icon;
+document.getElementById("temp3").innerText=forecast[2].day.avgtemp_c+"°C";
+
+}
+
+function searchWeather(){
+
+const city=document.getElementById("cityInput").value;
+
+if(city===""){
+alert("Enter city");
+return;
+}
+
+const url=`https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=3`;
+
+fetchWeather(url);
+
+}
+
+function getLocation(){
+
+navigator.geolocation.getCurrentPosition(position=>{
+
+const lat=position.coords.latitude;
+const lon=position.coords.longitude;
+
+const url=`https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${lat},${lon}&days=3`;
+
+fetchWeather(url);
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
